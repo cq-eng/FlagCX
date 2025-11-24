@@ -129,6 +129,10 @@ struct flagcxTunerContext {
   std::map<struct TunerCommTagCounterKey, int>
       configCounterMap; // record per (collType,nBytes,configIdx) counter.
 
+  int commConfigId = 0; // record the current communicator config id, used when tuning with FlagScale
+
+  int bestConfigId = -1; // record the best communicator config id, used when tuning with FlagScale
+
   // timer
   flagcxTimer<TunerProfileKey> timer;
 };
@@ -209,6 +213,10 @@ flagcxResult_t flagcxTunerInit(size_t nRanks, size_t nNodes,
   // initialize profilingResults pointer
   FLAGCXCHECK(
       flagcxCalloc(&internalTuner.profilingResults, internalTuner.nranks));
+  if (flagcxGetEnv("TUNING_WITH_FLAGSCALE")) {
+    setenv("FLAGCX_TUNER_DONE", "0", 1);
+    return flagcxSuccess;
+  }
   // start timer
   ctx->timer.start();
   return flagcxSuccess;
@@ -497,6 +505,83 @@ flagcxResult_t flagcxTunerGetCollInfo(void *context, flagcxCommOp_t collType,
   return flagcxSuccess;
 }
 
+flagcxResult_t switchCommConfig(void *context, flagcxComm_t *comm,
+                                int bestConfigId) {
+  struct flagcxTunerContext *ctx =
+      static_cast<struct flagcxTunerContext *>(context);
+
+  if (ctx->commConfigId < ctx->configList.size()) {
+    if (bestConfigId != -1) {
+      WARN(
+          "bestConfigId=%d is not -1, but commConfigId=%d is less than "
+          "configList.size()=%zu",
+          bestConfigId, ctx->commConfigId, ctx->configList.size());
+      return flagcxInternalError;
+    }
+
+    const auto &cfg = ctx->configList[ctx->commConfigId];
+    auto inner = (*comm)->tunerInnerComm;
+    if (inner == nullptr) {
+      WARN("comm->tunerInnerComm is null");
+      return flagcxInternalError;
+    }
+
+    FLAGCXCHECK(cclAdaptors[flagcxCCLAdaptorDevice]->commDestroy(inner));
+    FLAGCXCHECK(setEnvConfig(cfg, FLAGCX_ENV_TYPE_CREATION));
+    flagcxInnerComm_t newInner = NULL;
+    FLAGCXCHECK(flagcxHomoCommInit(
+        (*comm)->commId, (*comm)->uniqueIdData,
+        (struct bootstrapState *)((*comm)->tuner->bootstrap), *comm, &newInner));
+    (*comm)->tunerInnerComm = newInner;
+    (*comm)->homo_comm = newInner;
+    FLAGCXCHECK(setEnvConfig(cfg, FLAGCX_ENV_TYPE_COLL));
+    INFO(FLAGCX_TUNING, "switch to the new communicator config, config_id=%d",
+         ctx->commConfigId);
+    ctx->commConfigId += 1;
+    return flagcxSuccess;
+  }
+
+  setenv("FLAGCX_TUNER_DONE", "1", 1);
+  INFO(FLAGCX_TUNING,
+       "Tuning completed: all %zu communicator configurations have been "
+       "tested. ENV FLAGCX_TUNER_DONE=%s",
+       ctx->configList.size(), getenv("FLAGCX_TUNER_DONE"));
+
+  if (bestConfigId != -1 && ctx->bestConfigId == -1) {
+    ctx->bestConfigId = bestConfigId;
+    const auto &cfg = ctx->configList[ctx->bestConfigId];
+    auto inner = (*comm)->tunerInnerComm;
+    if (inner == nullptr) {
+      WARN("comm->tunerInnerComm is null");
+      return flagcxInternalError;
+    }
+
+    FLAGCXCHECK(cclAdaptors[flagcxCCLAdaptorDevice]->commDestroy(inner));
+    FLAGCXCHECK(setEnvConfig(cfg, FLAGCX_ENV_TYPE_CREATION));
+    flagcxInnerComm_t newInner = NULL;
+    FLAGCXCHECK(flagcxHomoCommInit(
+        (*comm)->commId, (*comm)->uniqueIdData,
+        (struct bootstrapState *)((*comm)->tuner->bootstrap), *comm, &newInner));
+    (*comm)->tunerInnerComm = newInner;
+    (*comm)->homo_comm = newInner;
+    FLAGCXCHECK(setEnvConfig(cfg, FLAGCX_ENV_TYPE_COLL));
+    std::stringstream msg;
+    msg << "Best Envs: ";
+    for (int i = 0; i < cfg.envCount; i++) {
+      msg << cfg.envs[i].name << "=" << cfg.envs[i].value
+          << "(default=" << cfg.envs[i].defaultValue << ")";
+      if (i < cfg.envCount - 1) {
+        msg << "  ";
+      }
+    }
+    INFO(FLAGCX_TUNING, "switch to the best config, config_id=%d. %s",
+         ctx->bestConfigId, msg.str().c_str());
+    return flagcxSuccess;
+  }
+  ctx->bestConfigId = 5;
+  return flagcxSuccess;
+}
+
 flagcxResult_t flagcxTunerStartProfiling(void *context, flagcxCommOp_t collType,
                                          size_t nBytes, flagcxStream_t stream,
                                          const struct flagcxCommTag *commTag,
@@ -593,4 +678,5 @@ flagcxTuner_t internalTuner = {"internal tuner",
                                flagcxTunerStartProfiling,
                                flagcxTunerStopProfiling,
                                flagcxTunerDestroy,
-                               flagcxCreateOrReplaceHomoComm};
+                               flagcxCreateOrReplaceHomoComm,
+                               switchCommConfig};
