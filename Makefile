@@ -271,7 +271,6 @@ INCLUDEDIR := \
 	$(abspath flagcx/core/include) \
 	$(abspath flagcx/service/include) \
 	$(abspath third-party/json/single_include)
->>>>>>> b79062f (Put the nlohmann/json repo as a git submodule.)
 
 LIBSRCFILES:= \
 	$(wildcard flagcx/*.cc) \
