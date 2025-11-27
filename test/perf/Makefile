@@ -33,6 +33,7 @@ COMPILER = g++
 EXTRA_COMPILER_FLAG = -Wall -Wextra -Wno-unused-parameter -Wno-unused-function -Wl,-rpath,../../build/lib -std=c++11 -g
 
 INCLUDEDIR := $(abspath include)
+JSON_INCLUDE = $(abspath ../../third-party/json/single_include)
 LIBSRCFILES:= $(wildcard *.cc)
 
 all: test-sendrecv test-allreduce test-allgather test-reducescatter test-alltoall test-alltoallv test-broadcast test-gather test-scatter test-reduce test-core-sendrecv test-ipc-sendrecv test-put
@@ -79,11 +80,11 @@ test-reduce: test_reduce.cpp
 
 test-core-sendrecv: test_core_sendrecv.cpp
 	@echo "Compiling $@"
-	@$(COMPILER) $(EXTRA_COMPILER_FLAG) -o test_core_sendrecv test_core_sendrecv.cpp $(LIBSRCFILES) -I../../flagcx/include -I../../flagcx/service/include -I../../flagcx/core/include -I$(INCLUDEDIR) -I$(MPI_INCLUDE) -L../../build/lib/ -L$(MPI_LIB) -lflagcx $(MPI_LINK)
+	@$(COMPILER) $(EXTRA_COMPILER_FLAG) -o test_core_sendrecv test_core_sendrecv.cpp $(LIBSRCFILES) -I../../flagcx/include -I../../flagcx/service -I../../flagcx/core -I$(INCLUDEDIR) -I$(JSON_INCLUDE) -I$(MPI_INCLUDE) -L../../build/lib/ -L$(MPI_LIB) -lflagcx $(MPI_LINK)
 
 test-ipc-sendrecv: test_ipc_sendrecv.cpp
 	@echo "Compiling $@"
-	@$(COMPILER) $(EXTRA_COMPILER_FLAG) -o test_ipc_sendrecv test_ipc_sendrecv.cpp $(LIBSRCFILES) -I../../flagcx/include -I../../flagcx/service/include -I../../flagcx/core/include -I$(INCLUDEDIR) -I$(MPI_INCLUDE) -L../../build/lib/ -L$(MPI_LIB) -lflagcx $(MPI_LINK)
+	@$(COMPILER) $(EXTRA_COMPILER_FLAG) -o test_ipc_sendrecv test_ipc_sendrecv.cpp $(LIBSRCFILES) -I../../flagcx/include -I../../flagcx/service -I../../flagcx/core -I$(INCLUDEDIR) -I$(JSON_INCLUDE) -I$(MPI_INCLUDE) -L../../build/lib/ -L$(MPI_LIB) -lflagcx $(MPI_LINK)
 
 test-put: test_put.cpp
 	@echo "Compiling $@"
