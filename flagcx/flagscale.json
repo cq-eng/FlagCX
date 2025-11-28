@@ -4,7 +4,5 @@
         {"commOp": "allreduce", "nBytes": 8388608}, 
         {"commOp": "allgather", "nBytes": 67108864},
         {"commOp": "allgather", "nBytes": 134217728}
-    ],
-    "config_id": -1,
-    "best_config_id": -1
+    ]
 }

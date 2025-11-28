@@ -614,14 +614,17 @@ flagcxResult_t flagcxTunerSwitchCommConfig(void *context, flagcxComm_t *comm,
     INFO(FLAGCX_TUNING, "switch to the new communicator config, config_id=%d",
          ctx->commConfigId);
     ctx->commConfigId += 1;
+    // if all communicator configurations have been tested, set the environment
+    // variable FLAGCX_TUNER_DONE to 1
+    if (ctx->commConfigId >= ctx->configList.size()) {
+      setenv("FLAGCX_TUNER_DONE", "1", 1);
+      INFO(FLAGCX_TUNING,
+           "Tuning completed: all %zu communicator configurations have been "
+           "tested. ENV FLAGCX_TUNER_DONE=%s",
+           ctx->configList.size(), getenv("FLAGCX_TUNER_DONE"));
+    }
     return flagcxSuccess;
   }
-
-  setenv("FLAGCX_TUNER_DONE", "1", 1);
-  INFO(FLAGCX_TUNING,
-       "Tuning completed: all %zu communicator configurations have been "
-       "tested. ENV FLAGCX_TUNER_DONE=%s",
-       ctx->configList.size(), getenv("FLAGCX_TUNER_DONE"));
 
   if (bestConfigId != -1 && ctx->bestConfigId == -1) {
     ctx->bestConfigId = bestConfigId;
