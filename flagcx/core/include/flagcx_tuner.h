@@ -131,9 +131,9 @@ flagcxResult_t flagcxDestroyHomoCommByTag(flagcxComm_t comm, uint32_t idx);
     if (comm->isTuningWithFlagscale) {                                         \
       /* Execute matching only once when tune_objects has values */            \
       static bool matchingDone = false;                                        \
-      FlagScaleConfig config = readFlagScaleJson();                            \
       if (!matchingDone) {                                                     \
         /* Determine if this comm needs tuning */                              \
+        FlagScaleConfig config = readFlagScaleJson();                          \
         if (!config.tune_objects.empty()) {                                    \
           bool isTuningComm = false;                                           \
           flagcxCommOp_t currentCommOp = (commOp);                             \
@@ -153,11 +153,12 @@ flagcxResult_t flagcxDestroyHomoCommByTag(flagcxComm_t comm, uint32_t idx);
       }                                                                        \
       /* Only execute config_id related logic if isTunningComm == true */      \
       if (comm->isTunningComm) {                                               \
-        FlagScaleConfig config = readFlagScaleJson();                          \
         static int lastFlagscaleConfigId = -1;                                 \
-        /*const int config_id = config.config_id; */                           \
-        static int config_id = config.config_id;                               \
-        const int bestConfigId = config.best_config_id;                        \
+        const char *configIdEnv = getenv("FLAGCX_TUNER_CONFIG_ID");            \
+        const int config_id = (configIdEnv != NULL) ? atoi(configIdEnv) : -1;  \
+        const char *bestConfigIdEnv = getenv("FLAGCX_TUNER_BEST_CONFIG_ID");   \
+        const int bestConfigId =                                               \
+            (bestConfigIdEnv != NULL) ? atoi(bestConfigIdEnv) : -1;            \
         /* if config_id is -1, just call the original function */              \
         if (config_id == -1) {                                                 \
           FLAGCXCHECK(call);                                                   \

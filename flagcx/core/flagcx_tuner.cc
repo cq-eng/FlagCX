@@ -581,7 +581,6 @@ flagcxResult_t switchCommConfig(void *context, flagcxComm_t *comm,
          ctx->bestConfigId, msg.str().c_str());
     return flagcxSuccess;
   }
-  ctx->bestConfigId = 5;
   return flagcxSuccess;
 }
 
