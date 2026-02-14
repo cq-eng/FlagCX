@@ -34,6 +34,14 @@
 #elif USE_AMD_ADAPTOR
 #include <ATen/hip/HIPEvent.h>
 #include <hip/hip_runtime.h>
+#elif USE_TSM_ADAPTOR
+#include "torch_txda/csrc/core/TXDAEvent.h"
+#include "torch_txda/csrc/core/TXDAStream.h"
+#include <tx_runtime.h>
+#elif USE_ENFLAME_ADAPTOR
+#include <gcu/gcu_event.h>
+#include <gcu/gcu_guard.h>
+#include <tops/tops_runtime_api.h>
 #endif
 
 namespace c10d {
@@ -288,6 +296,58 @@ public:
 
 private:
   at::cuda::CUDAEvent hipEvent_;
+};
+#elif USE_TSM_ADAPTOR
+class flagcxTxdaEvent : public flagcxEvent {
+public:
+  flagcxTxdaEvent() { txda_event = torch_txda::TXDAEvent(); }
+
+  void record(const int device_id) override {
+    txda_event.record(torch_txda::getCurrentTXDAStream(device_id));
+  }
+
+  void record(const flagcxStream_t &stream, const int device_id) override {
+    txda_event.record(
+        torch_txda::getStreamFromExternal(*(txStream_t *)stream, device_id));
+  }
+
+  void block(const int device_id) override {
+    txda_event.block(torch_txda::getCurrentTXDAStream(device_id));
+  }
+
+  void block(const flagcxStream_t &stream, const int device_id) override {
+    txda_event.block(
+        torch_txda::getStreamFromExternal(*(txStream_t *)stream, device_id));
+  }
+
+private:
+  torch_txda::TXDAEvent txda_event;
+};
+#elif USE_ENFLAME_ADAPTOR
+class flagcxTopsEvent : public flagcxEvent {
+public:
+  flagcxTopsEvent() { topsEvent_ = torch_gcu::GCUEvent(); }
+
+  void record(const int deviceId) override {
+    topsEvent_.record(torch_gcu::getCurrentGCUStream(deviceId));
+  }
+
+  void record(const flagcxStream_t &stream, const int deviceId) override {
+    topsEvent_.record(
+        torch_gcu::getStreamFromExternal(*(topsStream_t *)stream, deviceId));
+  }
+
+  void block(const int deviceId) override {
+    topsEvent_.block(torch_gcu::getCurrentGCUStream(deviceId));
+  }
+
+  void block(const flagcxStream_t &stream, const int deviceId) override {
+    topsEvent_.block(
+        torch_gcu::getStreamFromExternal(*(topsStream_t *)stream, deviceId));
+  }
+
+private:
+  torch_gcu::GCUEvent topsEvent_;
 };
 #endif
 

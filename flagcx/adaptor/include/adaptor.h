@@ -12,8 +12,7 @@
 #include "flagcx.h"
 #include "global_comm.h"
 #include "topo.h"
-
-typedef void (*flagcxLaunchFunc_t)(flagcxStream_t, void *);
+#include "utils.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,6 +35,7 @@ extern struct flagcxCCLAdaptor xcclAdaptor;
 extern struct flagcxCCLAdaptor duncclAdaptor;
 extern struct flagcxCCLAdaptor rcclAdaptor;
 extern struct flagcxCCLAdaptor tcclAdaptor;
+extern struct flagcxCCLAdaptor ecclAdaptor;
 extern struct flagcxCCLAdaptor *cclAdaptors[];
 
 extern struct flagcxDeviceAdaptor cudaAdaptor;
@@ -48,6 +48,7 @@ extern struct flagcxDeviceAdaptor kunlunAdaptor;
 extern struct flagcxDeviceAdaptor ducudaAdaptor;
 extern struct flagcxDeviceAdaptor hipAdaptor;
 extern struct flagcxDeviceAdaptor tsmicroAdaptor;
+extern struct flagcxDeviceAdaptor topsAdaptor;
 extern struct flagcxDeviceAdaptor *deviceAdaptor;
 
 extern struct flagcxNetAdaptor *netAdaptor;
@@ -73,6 +74,8 @@ struct flagcxCCLAdaptor {
   flagcxResult_t (*getUniqueId)(flagcxUniqueId_t *uniqueId);
   const char *(*getErrorString)(flagcxResult_t result);
   const char *(*getLastError)(flagcxInnerComm_t comm);
+  flagcxResult_t (*getStagedBuffer)(const flagcxInnerComm_t comm, void **buff,
+                                    size_t size, int isRecv);
 
   // Communicator functions
   flagcxResult_t (*commInitRank)(flagcxInnerComm_t *comm, int nranks,
@@ -94,6 +97,12 @@ struct flagcxCCLAdaptor {
   flagcxResult_t (*commRegister)(const flagcxInnerComm_t comm, void *buff,
                                  size_t size, void **handle);
   flagcxResult_t (*commDeregister)(const flagcxInnerComm_t comm, void *handle);
+  // Symmetric functions
+  flagcxResult_t (*commWindowRegister)(flagcxInnerComm_t comm, void *buff,
+                                       size_t size, flagcxWindow_t *win,
+                                       int winFlags);
+  flagcxResult_t (*commWindowDeregister)(flagcxInnerComm_t comm,
+                                         flagcxWindow_t win);
 
   // Communication functions
   flagcxResult_t (*reduce)(const void *sendbuff, void *recvbuff, size_t count,

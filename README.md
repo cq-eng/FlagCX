@@ -2,11 +2,11 @@
 
 ## About
 
-FlagCX is part of [FlagOS](https://flagos.io/), a unified, open-source AI system software stack that
-aims to foster an open technology ecosystem by seamlessly integrating various models, systems and chips.
-By "develop once, migrate across various chips", FlagOS aims to unlock the full computational potential
-of hardware, break down the barriers between different chip software stacks, and effectively reduce
-migration costs.
+FlagCX is part of [FlagOS](https://flagos.io/), a fully open-source system software stack
+designed to unify the model–system–chip layers and foster an open and collaborative ecosystem.
+It enables a "develop once, run anywhere" workflow across diverse AI accelerators,
+unlocking hardware performance, eliminating fragmentation among AI chipset-specific software stacks,
+and substantially lowering the cost of porting and maintaining AI workloads.
 
 [FlagCX](https://github.com/flagos-ai/FlagCX.git) is a scalable and adaptive cross-chip communication library.
 It serves as a platform where developers, researchers, and AI engineers can collaborate on various projects,
@@ -22,27 +22,28 @@ for cross-chip collective communications.
 
 The following table summarizes the currently supported communication backends and their corresponding capabilities.
 
-| Backend       | NCCL        | IXCCL       | CNCL        | MCCL        | XCCL        | DUCCL       | HCCL        | MUSACCL     | RCCL        | TCCL        |
-|:--------------|:------------|:------------|:------------|:------------|:------------|:------------|:------------|:------------|:------------|:------------|
-| Mode          | Homo/Hetero | Homo/Hetero | Homo/Hetero | Homo/Hetero | Homo/Hetero | Homo/Hetero | Homo/Hetero | Homo/Hetero | Homo/Hetero | Homo/Hetero |
-| send          | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/☓         | ✓/✓         | ✓/✓         | ✓/✓         |
-| recv          | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/☓         | ✓/✓         | ✓/✓         | ✓/✓         |
-| broadcast     | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/☓         | ✓/✓         | ✓/✓         | ✓/✓         |
-| gather        | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ☓/☓         | ✓/✓         | ✓/☓         | ✓/✓         | ✓/✓         | ✓/✓         |
-| scatter       | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/☓         | ✓/✓         | ✓/☓         | ✓/✓         | ✓/✓         | ✓/✓         |
-| reduce        | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/☓         | ✓/✓         | ✓/✓         | ✓/✓         |
-| allreduce     | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/☓         | ✓/✓         | ✓/✓         | ✓/✓         |
-| allgather     | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/☓         | ✓/✓         | ✓/✓         | ✓/✓         |
-| reducescatter | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/☓         | ✓/✓         | ✓/✓         | ✓/✓         |
-| alltoall      | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/☓         | ✓/✓         | ✓/✓         | ✓/✓         |
-| alltoallv     | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/☓         | ✓/✓         | ✓/☓         | ✓/✓         | ✓/✓         | ✓/✓         |
-| group ops     | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/☓         | ✓/✓         | ✓/✓         | ✓/✓         |
+| Backend       | NCCL        | IXCCL       | CNCL        | MCCL        | XCCL        | DUCCL       | HCCL        | MUSACCL     | RCCL        | TCCL        | ECCL        |
+|:--------------|:------------|:------------|:------------|:------------|:------------|:------------|:------------|:------------|:------------|:------------|:------------|
+| Mode          | Homo/Hetero | Homo/Hetero | Homo/Hetero | Homo/Hetero | Homo/Hetero | Homo/Hetero | Homo/Hetero | Homo/Hetero | Homo/Hetero | Homo/Hetero | Homo/Hetero |
+| send          | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/☓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         |
+| recv          | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/☓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         |
+| broadcast     | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/☓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         |
+| gather        | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ☓/☓         | ✓/✓         | ✓/☓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         |
+| scatter       | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/☓         | ✓/✓         | ✓/☓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         |
+| reduce        | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/☓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         |
+| allreduce     | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/☓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         |
+| allgather     | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/☓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         |
+| reducescatter | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/☓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         |
+| alltoall      | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/☓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         |
+| alltoallv     | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/☓         | ✓/✓         | ✓/☓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         |
+| group ops     | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/☓         | ✓/✓         | ✓/✓         | ✓/✓         | ✓/✓         |
 
 Note that *Homo* and *Hetero* modes refer to communications among homogeneous and heterogeneous clusters.
 All native collective communications libraries can be referenced through the links below (in alphabetic order):
 
 - [CNCL](https://www.cambricon.com/docs/sdk_1.7.0/cncl_1.2.1/user_guide/index.html#), Cambricon Communications Library.
 - [DUCCL](https://developer.sourcefind.cn), DU Collective Communications Library.
+- [ECCL](https://www.enflame-tech.com), Enflame Collective Communications Library.
 - [HCCL](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/82RC1alpha003/hccl/hcclug/hcclug_000001.html), Ascend Communications Library.
 - [IXCCL](https://www.iluvatar.com/software?fullCode=cpjs-rj-rjz), Iluvatar Corex Collective Communications Library.
 - [MCCL](https://developer.metax-tech.com/softnova/metax), Metax Collective Communications Library.
@@ -88,9 +89,9 @@ Note that PyTorch support is enabled via the FlagCX Torch plugin, which provides
 This plugin has undergone comprehensive validation across diverse communication backends and hardware platforms,
 ensuring robust functionality, consistent performance, and compatibility in multi-chip heterogeneous environments.
 
-| FlagCX Backend  | NCCL | IXCCL | CNCL | MCCL | XCCL | DUCCL | HCCL | MUSACCL | RCCL |
-| :-------------- | :--- | :---- | :--- | :--- | :--- | :---- | :--- | :------ | :--- |
-| PyTorch Support | ✓    | ✓     | ✓    | ✓    | ✓    | ✓     | ✓    | ✓       | ✓    |
+| FlagCX Backend  | NCCL | IXCCL | CNCL | MCCL | XCCL | DUCCL | HCCL | MUSACCL | RCCL | TCCL | ECCL |
+| :-------------- | :--- | :---- | :--- | :--- | :--- | :---- | :--- | :------ | :--- | :--- | :--- |
+| PyTorch Support | ✓    | ✓     | ✓    | ✓    | ✓    | ✓     | ✓    | ✓       | ✓    | ✓    |✓    |
 
 > [!TIP]
 > To enable heterogeneous cross-chip communication using the PyTorch DDP FlagCX backend,
@@ -132,5 +133,3 @@ Please refer to the docs below:
 ## License
 
 This project is licensed under the [Apache License (Version 2.0)](./LICENSE).
-
-

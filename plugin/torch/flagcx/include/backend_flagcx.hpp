@@ -58,6 +58,10 @@ public:
     event_ = std::make_unique<flagcxXpuEvent>();
 #elif USE_AMD_ADAPTOR
     event_ = std::make_unique<flagcxHipEvent>();
+#elif USE_TSM_ADAPTOR
+    event_ = std::make_unique<flagcxTxdaEvent>();
+#elif USE_ENFLAME_ADAPTOR
+    event_ = std::make_unique<flagcxTopsEvent>();
 #endif
   }
   bool isCompleted() override;
@@ -235,6 +239,10 @@ public:
     devName = "cuda";
 #elif USE_KUNLUNXIN_ADAPTOR
     devName = "cuda";
+#elif USE_TSM_ADAPTOR
+    devName = "txda";
+#elif USE_ENFLAME_ADAPTOR
+    devName = "gcu";
 #endif
     py::object module = py::module::import("torch.distributed");
     py::object registerBackend =
