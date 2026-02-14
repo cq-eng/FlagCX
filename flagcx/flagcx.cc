@@ -643,7 +643,7 @@ flagcxResult_t flagcxCommInitRank(flagcxComm_t *comm, int nranks,
         // Insert item into commMap
         (*comm)->commMap[tag] = innerComm;
         // For backward compatible, also assign homo_comm field.
-        (*comm)->homo_comm = innerComm;
+        (*comm)->homoComm = innerComm;
       }
     }
 

@@ -669,7 +669,7 @@ flagcxResult_t flagcxTunerSwitchCommConfig(void *context, flagcxComm_t *comm,
                                      (struct bootstrapState *)(ctx->bootstrap),
                                      *comm, &newInner));
       (*comm)->tunerInnerComm = newInner;
-      (*comm)->homo_comm = newInner;
+      (*comm)->homoComm = newInner;
     } else {
       const struct flagcxCommTag *commTag = &cfg.commTag;
       INFO(FLAGCX_TUNING, "Use Communicator tag %s based on profile data.",
@@ -712,7 +712,7 @@ flagcxResult_t flagcxTunerSwitchCommConfig(void *context, flagcxComm_t *comm,
                                      (struct bootstrapState *)(ctx->bootstrap),
                                      *comm, &newInner));
       (*comm)->tunerInnerComm = newInner;
-      (*comm)->homo_comm = newInner;
+      (*comm)->homoComm = newInner;
     } else {
 
       const struct flagcxCommTag *commTag = &cfg.commTag;
